@@ -1,15 +1,23 @@
 import { WebSocketServer } from "ws";
+import { io as Client } from "socket.io-client";
 
-const websocketSetup = (port) => {
+const websocketSetup = (port, expressSocketURL) => {
   const wss = new WebSocketServer({ port });
+  const expressSocket = Client(expressSocketURL);
 
   wss.on("connection", (ws) => {
     console.log("New WebSocket connection");
+
     ws.on("message", (message) => {
-      const data = JSON.parse(message);
-      //buat sebuah cara agar ada client yang menerima data dari Server ini
-      shareDataWaterLevel(data);
-      ws.send("Message received");
+      try {
+        const data = JSON.parse(message);
+        // Kirim data ke server Express.js melalui Socket.IO
+        expressSocket.emit("sensorData", data);
+
+        ws.send("Message received");
+      } catch (error) {
+        console.error("Failed to parse message", error);
+      }
     });
 
     ws.on("close", () => {
