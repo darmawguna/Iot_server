@@ -7,13 +7,12 @@ const websocketSetup = (port, expressSocketURL) => {
 
   wss.on("connection", (ws) => {
     console.log("New WebSocket connection");
-
+    
     ws.on("message", (message) => {
       try {
         const data = JSON.parse(message);
-        // Kirim data ke server Express.js melalui Socket.IO
-        expressSocket.emit("sensorData", data);
-
+        console.log("Data yang didapatkan setelah di parse: ", data);
+        expressSocket.emit("waterLevelFromServer", data);
         ws.send("Message received");
       } catch (error) {
         console.error("Failed to parse message", error);
